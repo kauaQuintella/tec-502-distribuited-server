@@ -1,7 +1,6 @@
 package com.cardgame_distribuited_servers.tec502.client.game.entity;
 
 import com.cardgame_distribuited_servers.tec502.server.game.entity.Skin;
-
 import java.util.ArrayList;
 import java.util.List;
 

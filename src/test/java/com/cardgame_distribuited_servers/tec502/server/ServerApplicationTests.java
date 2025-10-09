@@ -1,10 +1,10 @@
-package com.cardgame_distribuited_servers.tec502;
+package com.cardgame_distribuited_servers.tec502.server;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class Tec502ApplicationTests {
+class ServerApplicationTests {
 
 	@Test
 	void contextLoads() {

@@ -1,5 +1,25 @@
 services:
-#  web:
-#    build: .
-#    ports:
-#      - "8080:8080"
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+
+  rabbitmq:
+    image: "rabbitmq:3.13-management"
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      #O valor pode ser qualquer string longa e secreta.
+      - RABBITMQ_ERLANG_COOKIE=cookie-muito-gostoso
+    healthcheck:
+      test: rabbitmq-diagnostics check_running -q
+      interval: 30s
+      timeout: 10s
+      retries: 5
