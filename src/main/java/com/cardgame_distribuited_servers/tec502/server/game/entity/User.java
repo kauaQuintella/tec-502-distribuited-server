@@ -19,10 +19,6 @@ public class User {
         this.idUser = nickname+UUID.randomUUID().toString();
     }
 
-    //Será que precisa?
-    public void setNickname(String nickname) {this.nickname = nickname;}
-    public void setInventory(Inventory inventory) {this.inventory = inventory;}
-
     public String getIdUser() {return this.idUser;}
     public Inventory getInventory() {return inventory;}
     public String getNickname() {return nickname;}

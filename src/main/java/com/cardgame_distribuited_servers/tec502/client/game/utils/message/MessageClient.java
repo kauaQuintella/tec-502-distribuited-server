@@ -1,6 +1,6 @@
 package com.cardgame_distribuited_servers.tec502.client.game.utils.message;
 
-import org.project.client.utils.message.contents.Content;
+import com.cardgame_distribuited_servers.tec502.client.game.utils.message.contents.Content;
 
 public class MessageClient {
     private String sender;

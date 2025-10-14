@@ -2,8 +2,8 @@ package com.cardgame_distribuited_servers.tec502.client.game.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.project.client.libs.RuntimeTypeAdapterFactory;
-import org.project.client.utils.message.contents.*;
+import com.cardgame_distribuited_servers.tec502.client.game.libs.RuntimeTypeAdapterFactory;
+import com.cardgame_distribuited_servers.tec502.client.game.utils.message.contents.*;
 
 public enum GsonSingleton {
     INSTANCE;
