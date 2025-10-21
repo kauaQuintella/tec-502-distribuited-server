@@ -1,5 +1,81 @@
 services:
-#  web:
-#    build: .
-#    ports:
-#      - "8080:8080"
+
+  # --- SERVERS ---
+  app-1:
+    build: .
+    hostname: app-1
+    ports:
+      - "8080:8080"
+    depends_on:
+      rabbitmq-1:
+        condition: service_healthy
+    environment:
+      - SERVER_ID=app-1
+      - SERVER_PORT=8080
+      - PEER_URLS=http://app-2:8080,http://app-3:8080
+      - SPRING_RABBITMQ_HOST=rabbitmq-1
+      - SPRING_PROFILES_ACTIVE=local
+
+  app-2:
+    build: .
+    hostname: app-2
+    depends_on:
+      rabbitmq-1:
+        condition: service_healthy
+    environment:
+      - SERVER_ID=app-2
+      - SERVER_PORT=8080
+      - PEER_URLS=http://app-1:8080,http://app-3:8080
+      - SPRING_RABBITMQ_HOST=rabbitmq-1
+      - SPRING_PROFILES_ACTIVE=local
+
+  app-3:
+
+    hostname: app-3
+    build: .
+    depends_on:
+      rabbitmq-1:
+        condition: service_healthy
+    environment:
+      - SERVER_ID=app-3
+      - SERVER_PORT=8080
+      - PEER_URLS=http://app-1:8080,http://app-2:8080
+      - SPRING_RABBITMQ_HOST=rabbitmq-1
+      - SPRING_PROFILES_ACTIVE=local
+
+  # --- MESSAGE BROKER ---
+  rabbitmq-1:
+    image: "rabbitmq:3.13-management"
+    hostname: rabbitmq-1
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=cookie-muito-gostoso
+    healthcheck:
+      test: rabbitmq-diagnostics check_running -q
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # --- CLUSTER DE CONSENSO RAFT ---
+  raft-server-1:
+    image: pleshakoff/raft-server:1.0.0
+    hostname: raft-server-1
+    ports:
+      - "8081:8081"
+    command: --raft.election-timeout=5 --raft.id=1 --server.port=8081
+
+  raft-server-2:
+    image: pleshakoff/raft-server:1.0.0
+    hostname: raft-server-2
+    ports:
+      - "8082:8082"
+    command: --raft.election-timeout=7 --raft.id=2 --server.port=8082
+
+  raft-server-3:
+    image: pleshakoff/raft-server:1.0.0
+    hostname: raft-server-3
+    ports:
+      - "8083:8083"
+    command: --raft.election-timeout=9 --raft.id=3 --server.port=8083
