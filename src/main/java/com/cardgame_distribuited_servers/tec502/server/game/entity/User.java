@@ -7,16 +7,10 @@ public class User {
     private String nickname;
     private Inventory inventory;
 
-    public User(String nickname, Inventory inventory) {
+    public User(String nickname) {
         this.nickname = nickname;
-
-        if (inventory == null) {
-            this.inventory = new Inventory(); // Cria um inventário vazio
-        } else {
-            this.inventory = inventory;
-        }
-
-        this.idUser = nickname+UUID.randomUUID().toString();
+        this.inventory = new Inventory();
+        this.idUser = nickname+UUID.randomUUID();
     }
 
     public String getIdUser() {return this.idUser;}

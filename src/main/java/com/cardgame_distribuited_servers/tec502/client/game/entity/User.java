@@ -1,5 +1,5 @@
 package com.cardgame_distribuited_servers.tec502.client.game.entity;
-import com.cardgame_distribuited_servers.tec502.server.game.entity.Inventory;
+import com.cardgame_distribuited_servers.tec502.client.game.entity.Inventory;
 
 import java.util.UUID;
 
@@ -9,15 +9,9 @@ public class User {
     private String nickname;
     private Inventory inventory;
 
-    public User(String nickname, Inventory inventory) {
+    public User(String nickname) {
         this.nickname = nickname;
-
-        if (inventory == null) {
-            this.inventory = new Inventory(); // Cria um inventário vazio
-        } else {
-            this.inventory = inventory;
-        }
-
+        this.inventory = new Inventory(); // Cria um inventário vazio
         this.idUser = nickname+UUID.randomUUID().toString();
     }
 
