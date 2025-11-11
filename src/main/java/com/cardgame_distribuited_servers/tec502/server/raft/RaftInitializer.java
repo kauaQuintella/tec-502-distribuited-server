@@ -2,12 +2,14 @@ package com.cardgame_distribuited_servers.tec502.server.raft;
 
 import com.cardgame_distribuited_servers.tec502.server.game.entity.Skin;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
@@ -15,7 +17,7 @@ public class RaftInitializer implements ApplicationRunner {
 
     private final RaftClientService raftClientService;
     private final Gson gson = new Gson();
-    private boolean alreadyInitialized = false; // Flag simples para evitar múltiplas inicializações
+    private boolean alreadyInitialized = false;
 
     public RaftInitializer(RaftClientService raftClientService) {
         this.raftClientService = raftClientService;
@@ -23,18 +25,19 @@ public class RaftInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        // TODO: Implementar uma forma mais robusta de verificar se já foi inicializado
         if (alreadyInitialized) return;
 
         System.out.println("A inicializar o inventário de Skins no Raft...");
         List<Skin> initialSkins = generateInitialSkins();
-        Collections.shuffle(initialSkins); // Embaralha para aleatoriedade
-
-        AtomicLong keyCounter = new AtomicLong(1); // Usar AtomicLong para segurança em ambientes concorrentes
+        Collections.shuffle(initialSkins);
+        AtomicLong keyCounter = new AtomicLong(1);
 
         for (Skin skin : initialSkins) {
-            String skinJson = gson.toJson(skin);
-            raftClientService.submitOperation(keyCounter.getAndIncrement(), skinJson);
+            JsonElement skinPayload = gson.toJsonTree(skin);
+            RaftEntry raftEntry = new RaftEntry("SKIN", skinPayload);
+            String entryJson = gson.toJson(raftEntry);
+
+            raftClientService.submitOperation(keyCounter.getAndIncrement(), entryJson);
         }
 
         System.out.println("Inventário de Skins inicializado no Raft com " + initialSkins.size() + " itens.");
@@ -43,29 +46,37 @@ public class RaftInitializer implements ApplicationRunner {
 
     private List<Skin> generateInitialSkins() {
         List<Skin> skins = new ArrayList<>();
+        String unowned = null;
 
-        // Skins Raras - 50 de cada
+        // Skins Raras - 20 de cada
+        for (int i = 0; i < 20; i++) {
+            skins.add(new Skin("FOGO_R_" + i, "Fogo Infernal", "Raro", unowned));
+            skins.add(new Skin("AGUA_R_" + i, "Tsunami", "Raro", unowned));
+            skins.add(new Skin("NATUREZA_R_" + i, "Avatar da Floresta", "Raro", unowned));
+        }
+
+
+        // Skins Comuns - 50 de cada
         for (int i = 0; i < 50; i++) {
-            skins.add(new Skin("FOGO_R_" + i, "Fogo Infernal", "Raro"));
-            skins.add(new Skin("AGUA_R_" + i, "Tsunami", "Raro"));
-            skins.add(new Skin("NATUREZA_R_" + i, "Avatar da Floresta", "Raro"));
+            skins.add(new Skin("FOGO_C_" + i, "Chama Simples", "Comum", unowned));
+            skins.add(new Skin("AGUA_C_" + i, "Gota de Orvalho", "Comum", unowned));
+            skins.add(new Skin("NATUREZA_C_" + i, "Folha Verdejante", "Comum", unowned));
         }
 
-        // Skins Comuns - 140 de cada
-        for (int i = 0; i < 140; i++) {
-            skins.add(new Skin("FOGO_C_" + i, "Chama Simples", "Comum"));
-            skins.add(new Skin("AGUA_C_" + i, "Gota de Orvalho", "Comum"));
-            skins.add(new Skin("NATUREZA_C_" + i, "Folha Verdejante", "Comum"));
+        // Skins Lendárias - 5 de cada
+        for (int i = 0; i < 5; i++) {
+            skins.add(new Skin("FOGO_L_" + i, "Hades", "Lendário", unowned));
+            skins.add(new Skin("AGUA_L_" + i, "Neptuno", "Lendário", unowned));
+            skins.add(new Skin("NATUREZA_L_" + i, "Gaia", "Lendário", unowned));
         }
 
-        // Skins Lendárias - 10 de cada
-        for (int i = 0; i < 10; i++) {
-            skins.add(new Skin("FOGO_L_" + i, "Hades", "Lendário"));
-            skins.add(new Skin("AGUA_L_" + i, "Neptuno", "Lendário"));
-            skins.add(new Skin("NATUREZA_L_" + i, "Gaia", "Lendário"));
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Thread interrupted during sleep.");
         }
 
-        // Embaralha o estoque para que a ordem seja aleatória
         Collections.shuffle(skins);
         System.out.println("SkinsManager inicializado com " + skins.size() + " skins únicas.");
 

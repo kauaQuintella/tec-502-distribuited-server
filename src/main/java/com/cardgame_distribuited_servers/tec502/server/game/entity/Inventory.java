@@ -11,7 +11,7 @@ public class Inventory {
     }
 
     public List<Skin> getSkins() { return skins; }
-    public void addSkin (Skin skin) { // DEPOIS: Aceita um objeto Skin
+    public void addSkin (Skin skin) {
         this.skins.add(skin);
     }
 }
