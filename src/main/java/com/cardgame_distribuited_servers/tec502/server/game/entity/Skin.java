@@ -1,26 +1,16 @@
 package com.cardgame_distribuited_servers.tec502.server.game.entity;
 
-public class Skin {
-    private final String id;
-    private final String nome;
-    private final String raridade; // Ex: "Comum", "Raro", "Épico"
-
+public record Skin(
+        String id,
+        String nome,
+        String raridade,
+        String ownerId
+) {
     public Skin(String id, String nome, String raridade) {
-        this.id = id;
-        this.nome = nome;
-        this.raridade = raridade;
+        this(id, nome, raridade, null);
     }
 
-    // Getters
-    public String getId() { return id; }
-    public String getNome() { return nome; }
-    public String getRaridade() { return raridade; }
-
-    @Override
-    public String toString() {
-        return "Skin{" +
-                "nome='" + nome + '\'' +
-                ", raridade='" + raridade + '\'' +
-                '}';
+    public Skin withNewOwner(String newOwnerId) {
+        return new Skin(this.id, this.nome, this.raridade, newOwnerId);
     }
 }
